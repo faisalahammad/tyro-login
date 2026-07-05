@@ -2,6 +2,11 @@
 
 All notable changes to `tyro-login` will be documented in this file.
 
+## [2.12.1]
+
+### Fixed
+
+-   **2FA setup login loop** - Freshly registered (unconfirmed) users could not log in when `TYRO_LOGIN_2FA_ENABLED="true"`: they were redirected to the 2FA setup page and bounced back to the login page.
 ## [2.12.0] - 2026-06-23
 
 ### Added
