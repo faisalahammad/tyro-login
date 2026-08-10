@@ -1,6 +1,6 @@
 {
     "name": "hasinhayder/tyro-login",
-    "description": "Tyro Login - Beautiful, customizable authentication views for Laravel 12 & 13",
+    "description": "Complete authentication kit for Laravel 12 & 13 — 10 premium layouts, social OAuth, passkeys, TOTP 2FA, OTP, magic links, invitations, lockout, captcha and beautiful emails",
     "keywords": [
         "laravel",
         "authentication",
