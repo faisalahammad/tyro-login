@@ -178,6 +178,7 @@ class TyroLoginServiceProvider extends ServiceProvider {
             \HasinHayder\TyroLogin\Console\Commands\MagicLinkCommand::class,
             \HasinHayder\TyroLogin\Console\Commands\InviteLinkCommand::class,
             \HasinHayder\TyroLogin\Console\Commands\SetupPasskeysCommand::class,
+            \HasinHayder\TyroLogin\Console\Commands\StatusCommand::class,
         ]);
     }
 }
