@@ -99,8 +99,19 @@ Route::middleware('guest')->group(function () {
 
     Route::post('two-factor/verify', [TwoFactorController::class, 'verify'])
         ->name('two-factor.verify');
+});
 
-    // 2FA Setup routes (guest because user is not fully logged in yet)
+// 2FA Setup routes are reachable by BOTH an authenticated user (e.g. the
+// Tyro-Dashboard workflow) AND a logged-out user mid-login (the login flow
+// logs the user out, stashes login.id in the session, then redirects here).
+// They MUST NOT be registered inside the `guest` or `auth` middleware groups:
+//   - `auth` would bounce the logged-out login flow back to the login page.
+//   - `guest` would bounce the authenticated dashboard user to the home page.
+// They also MUST NOT be registered twice at the same URI: Laravel keeps only
+// the LAST route per method+URI, so a duplicate silently overwrites the other.
+// The controllers handle both states internally (Auth::user() with a login.id
+// fallback), so a single registration under `web` is correct.
+Route::middleware('web')->group(function () {
     Route::get('two-factor/setup', [TwoFactorController::class, 'showSetup'])
         ->name('two-factor.setup');
 
@@ -112,9 +123,6 @@ Route::middleware('guest')->group(function () {
 
     Route::post('two-factor/ignore', [TwoFactorController::class, 'ignore'])
         ->name('two-factor.ignore');
-
-    Route::get('two-factor/recovery-codes', [TwoFactorController::class, 'showRecoveryCodes'])
-        ->name('two-factor.recovery-codes');
 });
 
 // Authenticated routes
@@ -135,17 +143,4 @@ Route::middleware('auth')->group(function () {
         Route::delete(config('tyro-login.passkeys.remove_route', 'remove-passkeys').'/{id}', [PasskeyController::class, 'destroy'])
             ->name('passkeys.destroy');
     }
-
-    // 2FA Setup routes (duplicated for authenticated users)
-    Route::get('two-factor/setup', [TwoFactorController::class, 'showSetup'])
-        ->name('two-factor.setup');
-
-    Route::post('two-factor/confirm', [TwoFactorController::class, 'confirm'])
-        ->name('two-factor.confirm');
-
-    Route::post('two-factor/skip', [TwoFactorController::class, 'skip'])
-        ->name('two-factor.skip');
-
-    Route::post('two-factor/ignore', [TwoFactorController::class, 'ignore'])
-        ->name('two-factor.ignore');
 });
