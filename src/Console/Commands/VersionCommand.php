@@ -20,7 +20,7 @@ class VersionCommand extends Command {
      */
     public function handle(): int {
 
-        $version = '2.12.1'; // fix(2fa): resolve duplicate two-factor/setup route URI shadowing the guest route, which bounced logged-out (unconfirmed) users back to the login page
+        $version = '2.13.1'; // 2fa bug fix for duplicate two-factor/setup route URI shadowing the guest route, which bounced logged-out (unconfirmed) users back to the login page
         $this->info('');
         $this->info('  ╔════════════════════════════════════════╗');
         $this->info('  ║                                        ║');
@@ -40,7 +40,9 @@ class VersionCommand extends Command {
     }
 }
 
-// 2.12.1 - fix(2fa): two-factor/setup (and confirm/skip/ignore) was registered twice at the same URI (guest + auth); Laravel keeps only the last route per method+URI, so the auth-group route silently overwrote the guest one and bounced logged-out (unconfirmed) users back to the login page. Moved these endpoints into a single web-middleware group reachable by both the login flow and the authenticated Tyro-Dashboard flow.
+// 2.13.1 - fix(2fa): resolve duplicate two-factor/setup route URI shadowing the guest route, which bounced logged-out (unconfirmed) users back to the login page
+// 2.13.0 - Added new command tyro-login:status to check the status of Tyro Login package installation and configuration.
+// 2.12.1 - fix(2fa): resolve duplicate two-factor/setup route URI shadowing the guest route, which bounced logged-out (unconfirmed) users back to the login page
 // 2.12.0 - Added passkeys (WebAuthn) passwordless login, setup, and management (compatible with Laravel's native passkeys package)
 // 2.11.1 - Updated default YouTube video background URL
 // 2.11.0 - Added tidal background
