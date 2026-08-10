@@ -20,7 +20,7 @@ class VersionCommand extends Command {
      */
     public function handle(): int {
 
-        $version = '2.12.0'; // Passkeys (WebAuthn) passwordless login release
+        $version = '2.13.0'; // added new command tyro-login:status to check the status of Tyro Login package installation and configuration.
         $this->info('');
         $this->info('  ╔════════════════════════════════════════╗');
         $this->info('  ║                                        ║');
@@ -39,7 +39,8 @@ class VersionCommand extends Command {
         return self::SUCCESS;
     }
 }
-
+// 2.13.0 - Added new command tyro-login:status to check the status of Tyro Login package installation and configuration.
+// 2.12.1 - fix(2fa): resolve duplicate two-factor/setup route URI shadowing the guest route, which bounced logged-out (unconfirmed) users back to the login page
 // 2.12.0 - Added passkeys (WebAuthn) passwordless login, setup, and management (compatible with Laravel's native passkeys package)
 // 2.11.1 - Updated default YouTube video background URL
 // 2.11.0 - Added tidal background
