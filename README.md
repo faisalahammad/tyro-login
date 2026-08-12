@@ -206,27 +206,44 @@ php artisan tyro-login:publish --config
 
 ## CLI at a glance
 
+### Install & Setup
+
 | Command | Description |
 | --- | --- |
 | `tyro-login:install` | Install the package and publish configuration |
 | `tyro-login:install --with-social` | Install with social login support |
 | `tyro-login:install --with-passkeys` | Install with passkey (WebAuthn) support |
 | `tyro-login:setup-passkeys` | Enable passkeys on an existing installation |
+| `tyro-login:setup-ai-skill` | Install the Tyro AI skill for your agent |
+| `tyro-login:status` | Show configuration and feature status |
+
+### Publishing & Maintenance
+
+| Command | Description |
+| --- | --- |
 | `tyro-login:publish` | Publish config, views, email templates, and assets |
 | `tyro-login:publish-style` | Publish styles (theme + components) |
 | `tyro-login:publish-style --theme-only` | Publish only theme variables |
 | `tyro-login:update-style` | Update published styles |
 | `tyro-login:update-config` | Sync the latest config values |
-| `tyro-login:status` | Show configuration and feature status |
+
+### User Management
+
+| Command | Description |
+| --- | --- |
 | `tyro-login:verify-user` | Verify a user's email (by ID/email or `--all`) |
 | `tyro-login:unverify-user` | Remove email verification (by ID/email or `--all`) |
 | `tyro-login:reset-2fa` | Reset a user's 2FA (by ID or email) |
 | `tyro-login:invite-links` | Create, list, remove, or flush invitation links |
 | `tyro-login:magic-links` | Create, list, remove, or flush magic links |
+
+### Info
+
+| Command | Description |
+| --- | --- |
 | `tyro-login:version` | Display the installed version |
 | `tyro-login:doc` | Open the documentation |
 | `tyro-login:star` | Open GitHub to star the repository |
-| `tyro-login:setup-ai-skill` | Install the Tyro AI skill for your agent |
 
 Run `php artisan list tyro-login` to see every available command.
 
