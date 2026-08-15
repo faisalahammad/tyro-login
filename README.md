@@ -170,6 +170,12 @@ All options are env-configurable. Publish the config to customize further:
 php artisan tyro-login:publish --config
 ```
 
+If you ever need to update or sync your configuration with the latest package defaults later, run:
+
+```bash
+php artisan tyro-login:update-config
+```
+
 ### General
 
 | Env var | Default | Description |
