@@ -31,6 +31,6 @@ composer.lock
 FIX_LOGIN_ROUTE_ERROR.md
 .kilo
 *.html
-.puku
 passkeys-internal.md
 .commandcode
+force-logout.md
