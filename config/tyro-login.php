@@ -836,4 +836,39 @@ return [
         // Lockout page subtitle/explanation
         'subtitle' => env('TYRO_LOGIN_LOCKOUT_SUBTITLE', 'For your security, we\'ve temporarily locked your account.'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Force Logout
+    |--------------------------------------------------------------------------
+    |
+    | Instantly force a user to log out on their next request.
+    |
+    | Trigger it from anywhere in your app:
+    |
+    |     event(new \HasinHayder\TyroLogin\Events\ForceLogout($userId));
+    |
+    | Or via Artisan:
+    |
+    |     php artisan tyro-login:logout 2        (by ID)
+    |     php artisan tyro-login:logout email    (by email)
+    |
+    | The flag is written to the cache as tyro-login-force-logout-<id> and is
+    | consumed (and cleared) by the ForceLogout middleware, which is
+    | automatically appended to the `web` middleware group. An alias
+    | `tyro-login.force-logout` is also available if you prefer to apply
+    | the middleware to specific route groups only.
+    |
+    | Environment: TYRO_LOGIN_FORCE_LOGOUT_ENABLED, TYRO_LOGIN_FORCE_LOGOUT_TTL
+    |
+    */
+    'force_logout' => [
+        // Auto-register the force-logout middleware on the `web` group
+        'enabled' => env('TYRO_LOGIN_FORCE_LOGOUT_ENABLED', true),
+
+        // Minutes the flag stays in the cache before self-cleaning (0 = forever).
+        // Defaults to SESSION_LIFETIME + 1 so the flag always outlives the
+        // user's session — a forced logout can never expire before it fires.
+        'ttl' => (int) env('TYRO_LOGIN_FORCE_LOGOUT_TTL', (int) env('SESSION_LIFETIME', 120) + 1),
+    ],
 ];

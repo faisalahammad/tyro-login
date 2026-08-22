@@ -2,6 +2,16 @@
 
 All notable changes to `tyro-login` will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+-   **Force Logout** - Instantly force a user to log out on their next request
+    -   New `tyro-login:logout {id|email}` artisan command
+    -   New `HasinHayder\TyroLogin\Events\ForceLogout` event (`event(new ForceLogout($userId))`)
+    -   New `ForceLogoutMiddleware`, automatically appended to the `web` middleware group (alias: `tyro-login.force-logout`)
+    -   Configurable via `tyro-login.force_logout` (enabled, ttl)
+
 ## [2.12.1]
 
 ### Fixed

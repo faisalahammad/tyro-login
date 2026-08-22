@@ -4,6 +4,7 @@ namespace HasinHayder\TyroLogin\Providers;
 
 use HasinHayder\TyroLogin\Console\Commands\DocCommand;
 use HasinHayder\TyroLogin\Console\Commands\InstallCommand;
+use HasinHayder\TyroLogin\Console\Commands\LogoutCommand;
 use HasinHayder\TyroLogin\Console\Commands\PublishCommand;
 use HasinHayder\TyroLogin\Console\Commands\PublishStyleCommand;
 use HasinHayder\TyroLogin\Console\Commands\SetupAiSkillCommand;
@@ -13,6 +14,10 @@ use HasinHayder\TyroLogin\Console\Commands\UpdateConfigCommand;
 use HasinHayder\TyroLogin\Console\Commands\UpdateStylesCommand;
 use HasinHayder\TyroLogin\Console\Commands\VerifyUserCommand;
 use HasinHayder\TyroLogin\Console\Commands\VersionCommand;
+use HasinHayder\TyroLogin\Events\ForceLogout;
+use HasinHayder\TyroLogin\Http\Middleware\ForceLogoutMiddleware;
+use HasinHayder\TyroLogin\Listeners\ForceLogoutListener;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -30,7 +35,8 @@ class TyroLoginServiceProvider extends ServiceProvider {
         $this->registerCommands();
         $this->registerMigrations();
         $this->configureAuthRedirection();
-
+        $this->registerEvents();
+        $this->registerForceLogoutMiddleware();
         $this->registerPasskeysAuthorization();
     }
 
@@ -148,6 +154,30 @@ class TyroLoginServiceProvider extends ServiceProvider {
         ], 'tyro-login');
     }
 
+    /**
+     * Force logout: flag a user in the cache so the middleware logs them
+     * out on their next request.
+     */
+    protected function registerEvents(): void {
+        Event::listen(ForceLogout::class, ForceLogoutListener::class);
+    }
+
+    protected function registerForceLogoutMiddleware(): void {
+        Route::aliasMiddleware('tyro-login.force-logout', ForceLogoutMiddleware::class);
+
+        if (config('tyro-login.force_logout.enabled', true)) {
+            Route::matched(function (\Illuminate\Routing\Events\RouteMatched $event): void {
+                $middleware = $event->route->middleware();
+
+                if (in_array('web', $middleware, true)
+                    && ! in_array(ForceLogoutMiddleware::class, $middleware, true)) {
+                    $event->route->middleware(ForceLogoutMiddleware::class);
+                }
+            });
+        }
+
+    }
+
     protected function configureAuthRedirection(): void {
         // Configure Laravel's authentication middleware to redirect to tyro-login route
         $this->app->resolving(\Illuminate\Auth\Middleware\Authenticate::class, function ($authenticate) {
@@ -179,6 +209,7 @@ class TyroLoginServiceProvider extends ServiceProvider {
             \HasinHayder\TyroLogin\Console\Commands\InviteLinkCommand::class,
             \HasinHayder\TyroLogin\Console\Commands\SetupPasskeysCommand::class,
             \HasinHayder\TyroLogin\Console\Commands\StatusCommand::class,
+            LogoutCommand::class,
         ]);
     }
 }

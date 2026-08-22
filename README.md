@@ -119,6 +119,29 @@ TYRO_LOGIN_LOCKOUT_MAX_ATTEMPTS=5
 TYRO_LOGIN_LOCKOUT_DURATION=15
 ```
 
+### Force logout
+
+Kick a user out on their next request — no encryption, just a lightweight cache flag (`tyro-login-force-logout-<id>`) that is consumed and cleared by middleware automatically appended to the `web` group:
+
+```bash
+php artisan tyro-login:logout 2            # by user ID
+php artisan tyro-login:logout user@app.dev # by email
+```
+
+Or dispatch the event from anywhere in your app:
+
+```php
+use HasinHayder\TyroLogin\Events\ForceLogout;
+
+event(new ForceLogout($userId));
+```
+
+```env
+TYRO_LOGIN_FORCE_LOGOUT_ENABLED=true  # auto-register the middleware
+# TTL defaults to SESSION_LIFETIME + 1 minute; set to override, 0 = forever
+# TYRO_LOGIN_FORCE_LOGOUT_TTL=121
+```
+
 ## CLI at a glance
 
 ### Install & Setup
@@ -149,6 +172,7 @@ TYRO_LOGIN_LOCKOUT_DURATION=15
 | `tyro-login:verify-user` | Verify a user's email (by ID/email or `--all`) |
 | `tyro-login:unverify-user` | Remove email verification (by ID/email or `--all`) |
 | `tyro-login:reset-2fa` | Reset a user's 2FA (by ID or email) |
+| `tyro-login:logout` | Force a user logout on their next request (by ID or email) |
 | `tyro-login:invite-links` | Create, list, remove, or flush invitation links |
 | `tyro-login:magic-links` | Create, list, remove, or flush magic links |
 
