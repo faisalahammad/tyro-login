@@ -20,7 +20,7 @@ class VersionCommand extends Command {
      */
     public function handle(): int {
 
-        $version = '2.13.1'; // 2fa bug fix for duplicate two-factor/setup route URI shadowing the guest route, which bounced logged-out (unconfirmed) users back to the login page
+        $version = '2.14.0'; // Added zero-config forced user logout on the next web request
         $this->info('');
         $this->info('  ╔════════════════════════════════════════╗');
         $this->info('  ║                                        ║');
@@ -39,6 +39,7 @@ class VersionCommand extends Command {
         return self::SUCCESS;
     }
 }
+// 2.14.0 - Added zero-config forced user logout on the next web request
 // 2.13.1 - fix(2fa): resolve duplicate two-factor/setup route URI shadowing the guest route, which bounced logged-out (unconfirmed) users back to the login page
 // 2.13.0 - Added new command tyro-login:status to check the status of Tyro Login package installation and configuration.
 // 2.12.1 - fix(2fa): resolve duplicate two-factor/setup route URI shadowing the guest route, which bounced logged-out (unconfirmed) users back to the login page

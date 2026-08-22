@@ -20,7 +20,7 @@ class StatusCommand extends Command {
     /**
      * Fallback version when the package is not installed via Composer.
      */
-    protected const FALLBACK_VERSION = '2.12.0';
+    protected const FALLBACK_VERSION = '2.14.0';
 
     /**
      * Execute the console command.

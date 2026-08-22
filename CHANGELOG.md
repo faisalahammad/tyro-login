@@ -12,6 +12,12 @@ All notable changes to `tyro-login` will be documented in this file.
     -   New `ForceLogoutMiddleware`, automatically appended to the `web` middleware group (alias: `tyro-login.force-logout`)
     -   Configurable via `tyro-login.force_logout` (enabled, ttl)
 
+## [2.14.0] - 2026-08-23
+
+### Added
+
+-   **Force Logout** - Zero-config forced logout on a user's next web request, with Artisan command, event, cache flag, middleware, and configurable TTL.
+
 ## [2.12.1]
 
 ### Fixed
