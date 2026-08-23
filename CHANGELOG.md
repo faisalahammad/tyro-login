@@ -4,19 +4,27 @@ All notable changes to `tyro-login` will be documented in this file.
 
 ## [Unreleased]
 
+## [2.14.2] - 2026-08-23
+
+### Changed
+
+-   **Tyro Dashboard heartbeat invalidation** - The dashboard login heartbeat cache key is now cleared on every logout path (normal logout, and force logout via the `tyro-login:logout` command, `ForceLogout` event, and middleware), so the heartbeat can never go stale after a user is signed out.
+
+## [2.14.1] - 2026-08-23
+
 ### Added
 
--   **Force Logout** - Instantly force a user to log out on their next request
-    -   New `tyro-login:logout {id|email}` artisan command
-    -   New `HasinHayder\TyroLogin\Events\ForceLogout` event (`event(new ForceLogout($userId))`)
-    -   New `ForceLogoutMiddleware`, automatically appended to the `web` middleware group (alias: `tyro-login.force-logout`)
-    -   Configurable via `tyro-login.force_logout` (enabled, ttl)
+-   **Tyro Dashboard login heartbeat** - Successful logins (password and OTP) now record a dashboard heartbeat cache key (`tyro_dashboard_heartbeat_{id}`, 10-minute TTL) so Tyro Dashboard can track active logins.
 
 ## [2.14.0] - 2026-08-23
 
 ### Added
 
--   **Force Logout** - Zero-config forced logout on a user's next web request, with Artisan command, event, cache flag, middleware, and configurable TTL.
+-   **Force Logout** - Zero-config forced logout on a user's next web request
+    -   New `tyro-login:logout {id|email}` artisan command
+    -   New `HasinHayder\TyroLogin\Events\ForceLogout` event (`event(new ForceLogout($userId))`)
+    -   New `ForceLogoutMiddleware`, automatically appended to the `web` middleware group (alias: `tyro-login.force-logout`)
+    -   Configurable via `tyro-login.force_logout` (enabled, ttl)
 
 ## [2.12.1]
 
