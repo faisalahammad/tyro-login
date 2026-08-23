@@ -447,6 +447,12 @@ class LoginController extends Controller {
      * Log the user out.
      */
     public function logout(Request $request): RedirectResponse {
+        $user = Auth::user();
+
+        if ($user) {
+            Cache::forget("tyro_dashboard_heartbeat_{$user->getAuthIdentifier()}");
+        }
+
         Auth::logout();
 
         $request->session()->invalidate();

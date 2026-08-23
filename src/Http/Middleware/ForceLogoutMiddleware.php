@@ -26,6 +26,7 @@ class ForceLogoutMiddleware {
         }
 
         Cache::forget($key);
+        Cache::forget('tyro_dashboard_heartbeat_'.$user->getAuthIdentifier());
 
         Auth::logout();
 

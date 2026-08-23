@@ -12,6 +12,8 @@ class ForceLogoutListener {
     public function handle(ForceLogout $event): void {
         $ttl = (int) config('tyro-login.force_logout.ttl', (int) config('session.lifetime', 120) + 1);
 
+        Cache::forget('tyro_dashboard_heartbeat_'.$event->userId);
+
         Cache::put(
             'tyro-login-force-logout-'.$event->userId,
             now()->timestamp,

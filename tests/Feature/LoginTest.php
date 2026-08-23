@@ -59,11 +59,13 @@ it('can logout via POST', function () {
     ]);
 
     $this->actingAs($user);
+    Cache::put("tyro_dashboard_heartbeat_{$user->id}", now()->getTimestamp(), 600);
 
     $response = $this->post('/logout');
 
     $response->assertRedirect(config('tyro-login.redirects.after_logout', '/login'));
     $this->assertGuest();
+    expect(Cache::has("tyro_dashboard_heartbeat_{$user->id}"))->toBeFalse();
 });
 
 it('can logout via GET', function () {

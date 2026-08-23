@@ -34,11 +34,13 @@ it('stores a timestamp value in the cache key', function () {
 
 it('creates a force logout cache key via the artisan command with an ID', function () {
     $user = createTestUser();
+    Cache::put("tyro_dashboard_heartbeat_{$user->id}", now()->getTimestamp(), 600);
 
     $this->artisan('tyro-login:logout', ['identifier' => (string) $user->id])
         ->assertSuccessful();
 
     expect(Cache::has('tyro-login-force-logout-'.$user->id))->toBeTrue();
+    expect(Cache::has("tyro_dashboard_heartbeat_{$user->id}"))->toBeFalse();
 });
 
 it('creates a force logout cache key via the artisan command with an email', function () {
@@ -60,6 +62,7 @@ it('fails when the user does not exist', function () {
 it('forces the user out on their next request and clears the cache', function () {
     $user = createTestUser();
     $this->actingAs($user);
+    Cache::put("tyro_dashboard_heartbeat_{$user->id}", now()->getTimestamp(), 600);
 
     event(new ForceLogout($user->id));
 
@@ -67,6 +70,7 @@ it('forces the user out on their next request and clears the cache', function ()
 
     $this->assertGuest();
     expect(Cache::has('tyro-login-force-logout-'.$user->id))->toBeFalse();
+    expect(Cache::has("tyro_dashboard_heartbeat_{$user->id}"))->toBeFalse();
 });
 
 it('works via the artisan command end to end', function () {
