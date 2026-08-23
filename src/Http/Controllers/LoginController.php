@@ -228,6 +228,8 @@ class LoginController extends Controller {
                 return redirect()->route('tyro-login.otp.verify');
             }
 
+            $this->setDashboardHeartbeat($user);
+
             return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
         }
 
@@ -365,7 +367,16 @@ class LoginController extends Controller {
         // Log the user in
         Auth::login($user, $remember);
 
+        $this->setDashboardHeartbeat($user);
+
         return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
+    }
+
+    /**
+     * Mark the user as recently logged in for the Tyro Dashboard heartbeat.
+     */
+    protected function setDashboardHeartbeat($user): void {
+        Cache::put("tyro_dashboard_heartbeat_{$user->id}", now()->getTimestamp(), 600);
     }
 
     /**

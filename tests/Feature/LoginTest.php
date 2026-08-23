@@ -26,6 +26,7 @@ it('can login with valid credentials', function () {
 
     $response->assertRedirect(config('tyro-login.redirects.after_login', '/'));
     $this->assertAuthenticated();
+    expect(Cache::get("tyro_dashboard_heartbeat_{$user->id}"))->toBe(now()->getTimestamp());
 });
 
 it('fails login with invalid credentials', function () {

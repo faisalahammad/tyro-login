@@ -20,7 +20,7 @@ class VersionCommand extends Command {
      */
     public function handle(): int {
 
-        $version = '2.14.0'; // Added zero-config forced user logout on the next web request
+        $version = '2.14.1'; // Added Tyro Dashboard login heartbeat cache key
         $this->info('');
         $this->info('  ╔════════════════════════════════════════╗');
         $this->info('  ║                                        ║');
