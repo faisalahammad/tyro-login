@@ -20,7 +20,7 @@ class VersionCommand extends Command {
      */
     public function handle(): int {
 
-        $version = '2.14.2'; // Added Tyro Dashboard login heartbeat cache key invalidation on logout
+        $version = '2.15.0'; // Added optional email queueing via the tyro-login.emails.queue config
         $this->info('');
         $this->info('  ╔════════════════════════════════════════╗');
         $this->info('  ║                                        ║');
@@ -39,6 +39,7 @@ class VersionCommand extends Command {
         return self::SUCCESS;
     }
 }
+// 2.15.0 - Added tyro-login.emails.queue config (TYRO_LOGIN_EMAILS_QUEUE) to dispatch emails to the consuming app's queue instead of sending synchronously
 // 2.14.2 - Added Tyro Dashboard login heartbeat cache key invalidation on logout
 // 2.14.1 - Added Tyro Dashboard login heartbeat cache key
 // 2.14.0 - Added zero-config forced user logout on the next web request

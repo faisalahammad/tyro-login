@@ -4,6 +4,16 @@ All notable changes to `tyro-login` will be documented in this file.
 
 ## [Unreleased]
 
+## [2.15.0] - 2026-09-16
+
+### Added
+
+-   **Optional Email Queueing** - New `tyro-login.emails.queue` config option to dispatch emails to the consuming application's queue instead of sending synchronously
+    -   Enabled via `TYRO_LOGIN_EMAILS_QUEUE` (default `false` — existing synchronous sending behavior is unchanged)
+    -   Applies to all package emails: OTP, magic link, password reset, email verification, and welcome emails
+    -   Handled centrally by the new `HasinHayder\TyroLogin\Helpers\MailHelper` (`MailHelper::send()`), used by all six mail send sites
+    -   Requires a running queue worker (`php artisan queue:work`) when enabled; otherwise queued emails are never delivered
+
 ## [2.14.2] - 2026-08-23
 
 ### Changed

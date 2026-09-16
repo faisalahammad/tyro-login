@@ -2,6 +2,7 @@
 
 namespace HasinHayder\TyroLogin\Http\Controllers;
 
+use HasinHayder\TyroLogin\Helpers\MailHelper;
 use HasinHayder\TyroLogin\Mail\WelcomeMail;
 use HasinHayder\TyroLogin\Models\SocialAccount;
 use Illuminate\Http\RedirectResponse;
@@ -10,7 +11,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
@@ -198,7 +198,7 @@ class SocialAuthController extends Controller {
 
         // Send welcome email if enabled
         if (config('tyro-login.emails.welcome.enabled', true)) {
-            Mail::to($user->email)->send(new WelcomeMail(
+            MailHelper::send($user->email, new WelcomeMail(
                 userName: $user->name ?? 'User',
                 loginUrl: url(config('tyro-login.routes.prefix', '').'/login')
             ));

@@ -664,6 +664,13 @@ return [
     |
     */
     'emails' => [
+        // Queue all emails instead of sending synchronously.
+        // When true, emails are dispatched to the consuming application's
+        // default queue and processed by its queue worker.
+        // Requires a running queue worker (php artisan queue:work);
+        // otherwise these emails are never delivered.
+        'queue' => env('TYRO_LOGIN_EMAILS_QUEUE', false),
+
         // OTP verification email
         'otp' => [
             'enabled' => env('TYRO_LOGIN_EMAIL_OTP', true),

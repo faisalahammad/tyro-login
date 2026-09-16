@@ -3,6 +3,7 @@
 namespace HasinHayder\TyroLogin\Http\Controllers;
 
 use HasinHayder\TyroLogin\Helpers\InvitationHelper;
+use HasinHayder\TyroLogin\Helpers\MailHelper;
 use HasinHayder\TyroLogin\Mail\WelcomeMail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -10,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -120,7 +120,7 @@ class RegisterController extends Controller {
 
         // Send welcome email if enabled (only when email verification is not required)
         if (config('tyro-login.emails.welcome.enabled', true)) {
-            Mail::to($user->email)->send(new WelcomeMail(
+            MailHelper::send($user->email, new WelcomeMail(
                 userName: $user->name ?? 'User',
                 loginUrl: url(config('tyro-login.routes.prefix', '').'/login')
             ));

@@ -2,6 +2,7 @@
 
 namespace HasinHayder\TyroLogin\Http\Controllers;
 
+use HasinHayder\TyroLogin\Helpers\MailHelper;
 use HasinHayder\TyroLogin\Mail\PasswordResetMail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -10,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -59,7 +59,7 @@ class PasswordResetController extends Controller {
 
         // Send password reset email if enabled
         if (config('tyro-login.emails.password_reset.enabled', true)) {
-            Mail::to($user->email)->send(new PasswordResetMail(
+            MailHelper::send($user->email, new PasswordResetMail(
                 resetUrl: $resetUrl,
                 userName: $user->name ?? 'User',
                 expiresInMinutes: $expiresInMinutes

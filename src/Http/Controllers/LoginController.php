@@ -3,6 +3,7 @@
 namespace HasinHayder\TyroLogin\Http\Controllers;
 
 use Carbon\Carbon;
+use HasinHayder\TyroLogin\Helpers\MailHelper;
 use HasinHayder\TyroLogin\Mail\MagicLinkMail;
 use HasinHayder\TyroLogin\Mail\OtpMail;
 use Illuminate\Http\RedirectResponse;
@@ -11,7 +12,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -559,7 +559,7 @@ class LoginController extends Controller {
 
         // Send OTP via email if enabled
         if (config('tyro-login.emails.otp.enabled', true)) {
-            Mail::to($user->email)->send(new OtpMail(
+            MailHelper::send($user->email, new OtpMail(
                 otp: $otp,
                 userName: $user->name ?? 'User',
                 expiresInMinutes: $expire
@@ -897,13 +897,11 @@ class LoginController extends Controller {
 
         // Send email if enabled
         if (config('tyro-login.emails.magic_link.enabled', true)) {
-            Mail::to($user->email)->send(
-                new MagicLinkMail(
-                    magicLink: $magicLink,
-                    userName: $user->name ?? 'User',
-                    expiresInMinutes: $expiresInMinutes
-                )
-            );
+            MailHelper::send($user->email, new MagicLinkMail(
+                magicLink: $magicLink,
+                userName: $user->name ?? 'User',
+                expiresInMinutes: $expiresInMinutes
+            ));
         }
 
         return redirect()->back()->with('success', 'A magic link has been sent to your email. Please check your inbox.');

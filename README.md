@@ -383,6 +383,7 @@ php artisan tyro-login:update-config
 
 | Env var | Default | Description |
 | --- | --- | --- |
+| `TYRO_LOGIN_EMAILS_QUEUE` | `false` | Queue all emails via the app's queue worker instead of sending synchronously. Requires a running `php artisan queue:work`; otherwise these emails are never delivered |
 | `TYRO_LOGIN_EMAIL_OTP` | `true` | Send OTP email |
 | `TYRO_LOGIN_EMAIL_OTP_SUBJECT` | `Your Verification Code` | OTP email subject |
 | `TYRO_LOGIN_EMAIL_PASSWORD_RESET` | `true` | Send password reset email |

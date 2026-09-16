@@ -15,6 +15,10 @@ it('has correct redirect defaults', function () {
     expect(config('tyro-login.redirects.after_register'))->toBe('/');
 });
 
+it('has correct email defaults', function () {
+    expect(config('tyro-login.emails.queue'))->toBeFalse();
+});
+
 it('has correct tyro integration defaults', function () {
     expect(config('tyro-login.tyro.assign_default_role'))->toBeTrue();
     expect(config('tyro-login.tyro.default_role_slug'))->toBe('user');

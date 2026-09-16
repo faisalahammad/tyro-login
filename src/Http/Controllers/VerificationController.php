@@ -2,13 +2,13 @@
 
 namespace HasinHayder\TyroLogin\Http\Controllers;
 
+use HasinHayder\TyroLogin\Helpers\MailHelper;
 use HasinHayder\TyroLogin\Mail\VerifyEmailMail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -97,7 +97,7 @@ class VerificationController extends Controller {
 
         // Send verification email if enabled
         if ($sendEmail && config('tyro-login.emails.verify_email.enabled', true)) {
-            Mail::to($user->email)->send(new VerifyEmailMail(
+            MailHelper::send($user->email, new VerifyEmailMail(
                 verificationUrl: $url,
                 userName: $user->name ?? 'User',
                 expiresInMinutes: $expiresInMinutes
