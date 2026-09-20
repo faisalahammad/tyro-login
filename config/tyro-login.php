@@ -347,6 +347,11 @@ return [
         // Environment: TYRO_LOGIN_ENABLE_MAGIC_LINKS=true
         'magic_links_enabled' => env('TYRO_LOGIN_ENABLE_MAGIC_LINKS', false),
 
+        // Require user confirmation before consuming magic link
+        // Protects against social crawlers and link unfurling (Messenger, Slack, WhatsApp, Twitter, etc.)
+        // Environment: TYRO_LOGIN_MAGIC_LINK_REQUIRE_CONFIRMATION=true
+        'magic_link_require_confirmation' => env('TYRO_LOGIN_MAGIC_LINK_REQUIRE_CONFIRMATION', true),
+
         // Disable password-based login entirely
         // Hides password field, remember me, forgot password link, and "or" separator
         // Useful when only passkey or magic link login is desired
@@ -496,6 +501,13 @@ return [
             'subtitle' => env('TYRO_LOGIN_RESET_PASSWORD_SUBTITLE', 'Enter your new password below.'),
             'background_title' => env('TYRO_LOGIN_RESET_PASSWORD_BG_TITLE', 'Reset Your Password'),
             'background_description' => env('TYRO_LOGIN_RESET_PASSWORD_BG_DESCRIPTION', 'Create a new secure password for your account.'),
+        ],
+        'magic_link_confirm' => [
+            'title' => env('TYRO_LOGIN_MAGIC_LINK_CONFIRM_TITLE', 'Confirm Login'),
+            'subtitle' => env('TYRO_LOGIN_MAGIC_LINK_CONFIRM_SUBTITLE', 'Do you want to log in? Click the button below to continue.'),
+            'button_text' => env('TYRO_LOGIN_MAGIC_LINK_CONFIRM_BUTTON', 'Log In'),
+            'background_title' => env('TYRO_LOGIN_MAGIC_LINK_CONFIRM_BG_TITLE', 'Welcome Back!'),
+            'background_description' => env('TYRO_LOGIN_MAGIC_LINK_CONFIRM_BG_DESCRIPTION', 'One-click sign in with your secure magic login link.'),
         ],
     ],
 

@@ -2,7 +2,16 @@
 
 All notable changes to `tyro-login` will be documented in this file.
 
-## [Unreleased]
+## [2.16.0] - 2026-09-20
+
+### Added
+
+-   **Magic Link Confirmation Step** - Intermediary confirmation page before consuming one-time magic links.
+    -   Prevents link preview crawlers and bot unfurlers (e.g. Facebook Messenger, WhatsApp, Slack, Twitter/X) from inadvertently consuming and expiring magic links upon message sharing.
+    -   `GET /mlogin?hash=...` renders a clean confirmation screen asking "Do you want to log in?" without marking the token as used.
+    -   Submitting via `POST /mlogin` with CSRF protection verifies and consumes the link to log the user in.
+    -   Configurable via `tyro-login.features.magic_link_require_confirmation` (`TYRO_LOGIN_MAGIC_LINK_REQUIRE_CONFIRMATION`, defaults to `true`).
+    -   Customizable page content under `tyro-login.pages.magic_link_confirm`.
 
 ## [2.15.0] - 2026-09-16
 

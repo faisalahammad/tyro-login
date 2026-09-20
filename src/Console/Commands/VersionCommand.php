@@ -20,7 +20,7 @@ class VersionCommand extends Command {
      */
     public function handle(): int {
 
-        $version = '2.15.0'; // Added optional email queueing via the tyro-login.emails.queue config
+        $version = '2.16.0'; // Added intermediary confirmation page for magic links to prevent crawler unfurling invalidation
         $this->info('');
         $this->info('  ╔════════════════════════════════════════╗');
         $this->info('  ║                                        ║');
@@ -39,6 +39,7 @@ class VersionCommand extends Command {
         return self::SUCCESS;
     }
 }
+// 2.16.0 - Added intermediary confirmation page for magic links to prevent social media and chat preview crawlers from consuming and expiring one-time links
 // 2.15.0 - Added tyro-login.emails.queue config (TYRO_LOGIN_EMAILS_QUEUE) to dispatch emails to the consuming app's queue instead of sending synchronously
 // 2.14.2 - Added Tyro Dashboard login heartbeat cache key invalidation on logout
 // 2.14.1 - Added Tyro Dashboard login heartbeat cache key

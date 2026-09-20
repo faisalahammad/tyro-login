@@ -21,7 +21,8 @@ use Illuminate\Support\Facades\Route;
 // Guest routes
 Route::middleware('guest')->group(function () {
     // Magic Link
-    Route::get('mlogin', [LoginController::class, 'magicLogin'])->name('magic-link');
+    Route::get('mlogin', [LoginController::class, 'showMagicLoginConfirm'])->name('magic-link');
+    Route::post('mlogin', [LoginController::class, 'magicLogin'])->name('magic-link.submit');
 
     // Login routes
     Route::get(config('tyro-login.routes.login', 'login'), [LoginController::class, 'showLoginForm'])

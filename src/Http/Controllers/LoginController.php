@@ -714,6 +714,63 @@ class LoginController extends Controller {
     }
 
     /**
+     * Show magic link confirmation page.
+     * Prevents social media and chat preview bots (Messenger, Slack, WhatsApp, etc.)
+     * from inadvertently consuming and expiring one-time magic links on GET requests.
+     */
+    public function showMagicLoginConfirm(Request $request): View|RedirectResponse {
+        if (! config('tyro-login.features.magic_links_enabled', false)) {
+            return redirect()->route('tyro-login.login')
+                ->withErrors(['login' => 'Magic links are currently disabled.']);
+        }
+
+        $hash = $request->input('hash');
+
+        if (! $hash) {
+            return redirect()->route('tyro-login.login')
+                ->withErrors(['login' => 'Invalid magic link.']);
+        }
+
+        $data = Cache::get("tyro_magic_link_{$hash}");
+
+        if (! $data) {
+            return redirect()->route('tyro-login.login')
+                ->withErrors(['login' => 'Invalid or expired magic link.']);
+        }
+
+        if ($data['used']) {
+            return redirect()->route('tyro-login.login')
+                ->withErrors(['login' => 'This magic link has already been used.']);
+        }
+
+        $userModel = config('tyro-login.user_model', 'App\\Models\\User');
+        $user = $userModel::find($data['user_id']);
+
+        if (! $user) {
+            return redirect()->route('tyro-login.login')
+                ->withErrors(['login' => 'User associated with this magic link not found.']);
+        }
+
+        // If confirmation is disabled via config, proceed directly to login
+        if (! config('tyro-login.features.magic_link_require_confirmation', true)) {
+            return $this->magicLogin($request);
+        }
+
+        return view('tyro-login::magic-link-confirm', [
+            'layout' => config('tyro-login.layout', 'centered'),
+            'branding' => config('tyro-login.branding'),
+            'backgroundImage' => config('tyro-login.background_image'),
+            'videoBackground' => config('tyro-login.video_background'),
+            'features' => config('tyro-login.features'),
+            'pageContent' => config('tyro-login.pages.magic_link_confirm', []),
+            'hash' => $hash,
+            'user' => $user,
+            'email' => $user->email ?? null,
+            'name' => $user->name ?? null,
+        ]);
+    }
+
+    /**
      * Handle magic link login.
      */
     public function magicLogin(Request $request): RedirectResponse {
