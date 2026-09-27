@@ -73,3 +73,23 @@ it('shows recovery codes after confirming 2FA (route stays auth-reachable)', fun
     $recovery = $this->get('/two-factor/recovery-codes');
     $recovery->assertStatus(200);
 });
+
+it('sends the user to the post-login destination when finishing setup from recovery codes', function () {
+    config()->set('tyro-login.redirects.after_login', '/dashboard');
+    config()->set('tyro-login.two_factor.allow_skip', false);
+
+    $user = createUnconfirmedUser();
+    Auth::login($user);
+
+    $secret = app(\PragmaRX\Google2FA\Google2FA::class)->generateSecretKey();
+    $user->forceFill(['two_factor_secret' => \Illuminate\Support\Facades\Crypt::encryptString($secret)])->save();
+
+    $validOtp = app(\PragmaRX\Google2FA\Google2FA::class)->getCurrentOtp($secret);
+
+    $this->post('/two-factor/confirm', ['code' => $validOtp])
+        ->assertRedirect('/two-factor/recovery-codes');
+
+    // Finish must not route through the skip endpoint (which 403s when
+    // skipping is disabled) — it continues to the after-login destination.
+    $this->post('/two-factor/finish')->assertRedirect('/dashboard');
+});

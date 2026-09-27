@@ -133,6 +133,9 @@ Route::middleware('auth')->group(function () {
     Route::get('two-factor/recovery-codes', [TwoFactorController::class, 'showRecoveryCodes'])
         ->name('two-factor.recovery-codes');
 
+    Route::post('two-factor/finish', [TwoFactorController::class, 'finish'])
+        ->name('two-factor.finish');
+
     // Passkeys setup (registration). Only registered when enabled + installed.
     if (config('tyro-login.passkeys.enabled', false) && class_exists(\Laravel\Passkeys\Passkeys::class)) {
         Route::get(config('tyro-login.passkeys.route', 'passkeys-setup'), [PasskeyController::class, 'showSetup'])

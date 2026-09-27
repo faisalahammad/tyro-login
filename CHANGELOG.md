@@ -2,6 +2,12 @@
 
 All notable changes to `tyro-login` will be documented in this file.
 
+## [2.16.1] - 2026-09-27
+
+### Fixed
+
+-   **2FA setup "Finish" redirect** - Clicking Finish on the recovery codes screen (`/two-factor/recovery-codes`) now continues to the configured post-login destination (`tyro-login.redirects.after_login`, usually the dashboard) instead of being routed through the 2FA skip endpoint. The old behavior could return a 403 when skipping was disabled (`TYRO_LOGIN_2FA_ALLOW_SKIP=false`) or when the user had a forced 2FA role.
+
 ## [2.16.0] - 2026-09-20
 
 ### Added

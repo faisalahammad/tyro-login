@@ -224,6 +224,13 @@ class TwoFactorController extends Controller {
     }
 
     /**
+     * Finish the 2FA setup wizard and continue to the post-login destination.
+     */
+    public function finish(): RedirectResponse {
+        return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
+    }
+
+    /**
      * Show recovery codes.
      */
     public function showRecoveryCodes(Request $request): View {

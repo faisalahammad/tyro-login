@@ -34,7 +34,7 @@
             </div>
 
             <div class="mt-6">
-                <form method="POST" action="{{ route('tyro-login.two-factor.skip') }}">
+                <form method="POST" action="{{ route('tyro-login.two-factor.finish') }}">
                     @csrf
                     <button type="submit" class="btn btn-primary w-full text-center">
                         Finish
