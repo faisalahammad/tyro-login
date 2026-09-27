@@ -130,8 +130,6 @@ Route::middleware('web')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::match(['get', 'post'], config('tyro-login.routes.logout', 'logout'), [LoginController::class, 'logout'])
         ->name('logout');
-    Route::get('two-factor/recovery-codes', [TwoFactorController::class, 'showRecoveryCodes'])
-        ->name('two-factor.recovery-codes');
 
     Route::post('two-factor/finish', [TwoFactorController::class, 'finish'])
         ->name('two-factor.finish');

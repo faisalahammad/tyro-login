@@ -159,10 +159,9 @@ Eight immutable principles that govern every decision in this package:
 | `tyro-login.2fa.challenge` | GET | `2fa/challenge` | TwoFactorController@showChallenge | 2FA challenge form |
 | `tyro-login.2fa.verify` | POST | `2fa/challenge` | TwoFactorController@verify | Verify 2FA code |
 | `tyro-login.2fa.setup` | GET | `2fa/setup` | TwoFactorController@showSetup | 2FA setup page |
-| `tyro-login.2fa.confirm` | POST | `2fa/setup` | TwoFactorController@confirm | Confirm TOTP setup |
+| `tyro-login.2fa.confirm` | POST | `2fa/setup` | TwoFactorController@confirm | Confirm TOTP setup and display recovery codes (setup flow only, shown once) |
 | `tyro-login.2fa.skip` | POST | `2fa/skip` | TwoFactorController@skip | Skip 2FA setup |
 | `tyro-login.2fa.ignore` | POST | `2fa/ignore` | TwoFactorController@ignore | Ignore 2FA with cookie |
-| `tyro-login.2fa.recovery-codes` | GET | `2fa/recovery-codes` | TwoFactorController@showRecoveryCodes | Display recovery codes |
 | `tyro-login.2fa.finish` | POST | `2fa/finish` | TwoFactorController@finish | Finish setup and continue to after-login destination |
 | `tyro-login.social.redirect` | GET | `login/{provider}` | SocialAuthController@redirect | OAuth provider redirect |
 | `tyro-login.social.callback` | GET | `login/{provider}/callback` | SocialAuthController@callback | OAuth callback |

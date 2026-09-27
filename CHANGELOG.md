@@ -2,6 +2,15 @@
 
 All notable changes to `tyro-login` will be documented in this file.
 
+## [2.16.2] - 2026-09-27
+
+### Security
+
+-   **Recovery codes exposed to direct access** - The `GET /two-factor/recovery-codes` route has been removed. Recovery codes were previously rendered on a standalone page that any authenticated session could open at will, and it also rendered whenever 2FA was globally disabled or not yet confirmed. Recovery codes are now rendered only as the direct response to a successful `POST /two-factor/confirm` (the TOTP verification step), so the screen:
+    -   cannot be bookmarked, crawled, or opened directly (there is no GET URL for it);
+    -   is unavailable when `tyro-login.two_factor.enabled` is `false` (the confirm endpoint returns 404);
+    -   is shown exactly once per setup - replaying the confirmation POST redirects to the configured post-login destination and never re-displays or regenerates the codes.
+
 ## [2.16.1] - 2026-09-27
 
 ### Fixed

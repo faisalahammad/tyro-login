@@ -20,7 +20,7 @@ class VersionCommand extends Command {
      */
     public function handle(): int {
 
-        $version = '2.16.1'; // fix(2fa): Finish on the recovery codes screen now redirects to the post-login destination instead of the skip endpoint
+        $version = '2.16.2'; // security(2fa): recovery codes are now rendered only as the response to the confirmation POST; the standalone GET recovery-codes route is removed
         $this->info('');
         $this->info('  ╔════════════════════════════════════════╗');
         $this->info('  ║                                        ║');
@@ -39,6 +39,7 @@ class VersionCommand extends Command {
         return self::SUCCESS;
     }
 }
+// 2.16.2 - security(2fa): recovery codes can no longer be fetched directly. Codes are rendered only as the direct response to the confirmation POST (after TOTP verification and only when 2FA is enabled), and each set of codes is displayed exactly once
 // 2.16.1 - fix(2fa): recovery codes "Finish" button now redirects to the configured post-login destination (tyro-login.redirects.after_login) instead of the 2FA skip endpoint, which could 403 when skipping was disabled or the user had a forced role
 // 2.16.0 - Added intermediary confirmation page for magic links to prevent social media and chat preview crawlers from consuming and expiring one-time links
 // 2.15.0 - Added tyro-login.emails.queue config (TYRO_LOGIN_EMAILS_QUEUE) to dispatch emails to the consuming app's queue instead of sending synchronously

@@ -91,9 +91,18 @@ class TwoFactorController extends Controller {
     }
 
     /**
-     * Confirm 2FA setup.
+     * Confirm 2FA setup and show the recovery codes.
+     *
+     * The recovery codes are rendered as the direct response to this POST.
+     * They are never reachable through a separate GET route, so they can only
+     * be seen once, as part of the setup flow, immediately after the TOTP code
+     * has been verified.
      */
-    public function confirm(Request $request): RedirectResponse {
+    public function confirm(Request $request): View|RedirectResponse {
+        if (! config('tyro-login.two_factor.enabled', false)) {
+            abort(404);
+        }
+
         $request->validate([
             'code' => 'required|string',
         ]);
@@ -111,6 +120,12 @@ class TwoFactorController extends Controller {
             if (! $user) {
                 return redirect()->route('tyro-login.login');
             }
+        }
+
+        // 2FA is already confirmed - never re-show or regenerate recovery codes
+        // from a replayed confirmation request.
+        if ($user->two_factor_confirmed_at) {
+            return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
         }
 
         $google2fa = new Google2FA;
@@ -148,8 +163,7 @@ class TwoFactorController extends Controller {
             $request->session()->regenerate();
         }
 
-        // Redirect to show recovery codes and allow user to proceed
-        return redirect()->route('tyro-login.two-factor.recovery-codes');
+        return $this->recoveryCodesView($recoveryCodes);
     }
 
     /**
@@ -233,10 +247,7 @@ class TwoFactorController extends Controller {
     /**
      * Show recovery codes.
      */
-    public function showRecoveryCodes(Request $request): View {
-        $user = Auth::user();
-        $recoveryCodes = $this->getRecoveryCodes($user);
-
+    protected function recoveryCodesView(array $recoveryCodes): View {
         return view('tyro-login::two-factor-recovery-codes', [
             'layout' => config('tyro-login.layout', 'centered'),
             'branding' => config('tyro-login.branding'),

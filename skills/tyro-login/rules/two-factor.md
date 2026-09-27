@@ -181,7 +181,7 @@ public function showSetup(): View
 
 ```php
 // Recovery codes generated only after TOTP code is verified
-public function confirm(Request $request): RedirectResponse
+public function confirm(Request $request): View|RedirectResponse
 {
     $request->validate(['code' => ['required', 'string', 'size:6']]);
 
@@ -197,8 +197,10 @@ public function confirm(Request $request): RedirectResponse
     $user->two_factor_confirmed_at = now();
     $user->save();
 
-    session()->put('tyro-login.2fa.recovery_codes', $codes);
-    return redirect()->route('tyro-login.2fa.recovery-codes');
+    // Render the codes as the direct response to this POST. Never redirect to
+    // a separate GET recovery-codes page — that page would be directly
+    // accessible (and would expose codes even when 2FA is disabled).
+    return view('tyro-login::two-factor-recovery-codes', ['recoveryCodes' => $codes]);
 }
 
 protected function generateRecoveryCodes(): array
@@ -217,6 +219,7 @@ protected function generateRecoveryCodes(): array
 - Use `Str::random(10)` for code generation — these are long enough to be unguessable.
 - Recovery codes are shown only once after setup — the user is responsible for saving them.
 - Recovery codes are stored encrypted as a single JSON array.
+- Never expose recovery codes through a standalone GET route: gate them behind the successful TOTP confirmation POST and abort with a 404 when `tyro-login.two_factor.enabled` is false. If the user's 2FA is already confirmed, redirect to the post-login destination instead of re-rendering or regenerating the codes.
 
 ---
 

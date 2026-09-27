@@ -42,7 +42,7 @@ Route::post('login', [LoginController::class, 'login'])->name('tyro-login.login'
 
 ### Why It Matters
 
-Authentication routes accessible to already-logged-in users (login form, register form) must be separated from routes that require authentication (logout, recovery codes, 2FA setup). Mixing them in a single middleware group leads to inconsistent behavior and security issues.
+Authentication routes accessible to already-logged-in users (login form, register form) must be separated from routes that require authentication (logout, 2FA setup). Mixing them in a single middleware group leads to inconsistent behavior and security issues.
 
 ### Incorrect
 
@@ -72,11 +72,10 @@ Route::middleware(['web'])->prefix(config('tyro-login.routes.prefix', ''))
             // ... password reset, OTP, 2FA challenge, social auth, magic links
         });
 
-        // Authenticated routes — logout, 2FA management, recovery codes
+        // Authenticated routes — logout, 2FA management
         Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'logout', [LoginController::class, 'logout'])->name('logout');
-            Route::get('2fa/recovery-codes', [TwoFactorController::class, 'showRecoveryCodes'])->name('2fa.recovery-codes');
-            Route::post('2fa/setup', [TwoFactorController::class, 'confirm'])->name('2fa.confirm');
+            Route::post('2fa/finish', [TwoFactorController::class, 'finish'])->name('2fa.finish');
             // ... etc
         });
     });
@@ -85,8 +84,9 @@ Route::middleware(['web'])->prefix(config('tyro-login.routes.prefix', ''))
 ### Notes
 
 - Guest routes: login form, login submit, register form, register submit, password reset, OTP verify, 2FA challenge, social auth redirect/callback.
-- Auth routes: logout, 2FA setup, 2FA confirm, 2FA skip/ignore, recovery codes display.
+- Auth routes: logout, 2FA setup, 2FA confirm, 2FA skip/ignore, 2FA finish.
 - Never use `guest` for routes that modify state (logout, 2FA setup).
+- Never expose recovery codes on a standalone GET route. Render them as the direct response to the successful TOTP confirmation POST so the screen cannot be bookmarked, crawled, or visited directly — and so it is automatically unavailable when 2FA is disabled.
 
 ---
 
