@@ -4,6 +4,7 @@ namespace HasinHayder\TyroLogin\Http\Controllers;
 
 use Carbon\Carbon;
 use HasinHayder\TyroLogin\Helpers\MailHelper;
+use HasinHayder\TyroLogin\Helpers\TwoFactorHelper;
 use HasinHayder\TyroLogin\Mail\MagicLinkMail;
 use HasinHayder\TyroLogin\Mail\OtpMail;
 use Illuminate\Http\RedirectResponse;
@@ -169,33 +170,22 @@ class LoginController extends Controller {
 
                     return redirect()->route('tyro-login.two-factor.challenge');
                 } else {
-                    // User hasn't set up 2FA yet - redirect to setup
+                    // User hasn't set up 2FA yet
+
+                    // Role-based skip: users in skip_roles (and not in forced_roles)
+                    // are never prompted to set up 2FA.
+                    if (TwoFactorHelper::userShouldSkipTwoFactorSetup($user)) {
+                        $this->setDashboardHeartbeat($user);
+
+                        return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
+                    }
+
                     // Check if the user has previously chosen to ignore the 2FA setup nag
                     // (only applies when allow_skip is true and the user's role is not forced)
-                    if (config('tyro-login.two_factor.allow_skip', false)) {
-                        $forcedRoles = config('tyro-login.two_factor.forced_roles', '');
-                        $roles = $forcedRoles ? array_filter(array_map('trim', explode(',', $forcedRoles))) : [];
-                        $isForced = false;
-
-                        if (! empty($roles)) {
-                            if (method_exists($user, 'hasRole')) {
-                                foreach ($roles as $role) {
-                                    if ($user->hasRole($role)) {
-                                        $isForced = true;
-                                        break;
-                                    }
-                                }
-                            } elseif (isset($user->role)) {
-                                $isForced = in_array($user->role, $roles);
-                            }
-                        }
-
-                        if (! $isForced) {
-                            $ignoreCookieName = 'tyro_2fa_ignore_'.$user->id;
-                            if ($request->cookie($ignoreCookieName)) {
-                                return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
-                            }
-                        }
+                    if (config('tyro-login.two_factor.allow_skip', false)
+                        && ! TwoFactorHelper::userHasForcedRole($user)
+                        && $request->cookie('tyro_2fa_ignore_'.$user->id)) {
+                        return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
                     }
 
                     // Log them out to ensure they can't bypass setup
@@ -839,30 +829,16 @@ class LoginController extends Controller {
 
                 return redirect()->route('tyro-login.two-factor.challenge');
             } else {
-                if (config('tyro-login.two_factor.allow_skip', false)) {
-                    $forcedRoles = config('tyro-login.two_factor.forced_roles', '');
-                    $roles = $forcedRoles ? array_filter(array_map('trim', explode(',', $forcedRoles))) : [];
-                    $isForced = false;
+                // Role-based skip: users in skip_roles (and not in forced_roles)
+                // are never prompted to set up 2FA.
+                if (TwoFactorHelper::userShouldSkipTwoFactorSetup($user)) {
+                    return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
+                }
 
-                    if (! empty($roles)) {
-                        if (method_exists($user, 'hasRole')) {
-                            foreach ($roles as $role) {
-                                if ($user->hasRole($role)) {
-                                    $isForced = true;
-                                    break;
-                                }
-                            }
-                        } elseif (isset($user->role)) {
-                            $isForced = in_array($user->role, $roles);
-                        }
-                    }
-
-                    if (! $isForced) {
-                        $ignoreCookieName = 'tyro_2fa_ignore_'.$user->id;
-                        if ($request->cookie($ignoreCookieName)) {
-                            return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
-                        }
-                    }
+                if (config('tyro-login.two_factor.allow_skip', false)
+                    && ! TwoFactorHelper::userHasForcedRole($user)
+                    && $request->cookie('tyro_2fa_ignore_'.$user->id)) {
+                    return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
                 }
 
                 Auth::logout();

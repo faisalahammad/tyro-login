@@ -2,6 +2,21 @@
 
 All notable changes to `tyro-login` will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+-   **Skip 2FA roles** - New `tyro-login.two_factor.skip_roles` config option (`TYRO_LOGIN_2FA_SKIP_ROLES`, comma-separated role list) for roles that are never prompted to set up 2FA — after registration, on login, on magic link login, and on social login. The setup screen is only suppressed as an automatic prompt: a logged-in skip-role user can still open `/two-factor/setup` to enroll voluntarily.
+    -   Useful for keeping 2FA enabled for admins without nagging regular users (e.g. `TYRO_LOGIN_2FA_SKIP_ROLES=user`).
+    -   Roles listed in `tyro-login.two_factor.forced_roles` always take precedence: a role present in both lists is still required to set up 2FA.
+    -   Independent of `TYRO_LOGIN_2FA_ALLOW_SKIP` (the per-user skip/ignore mechanism); works even when skipping is disallowed.
+    -   Users who already confirmed 2FA are still challenged as usual — the setting only suppresses the setup prompt.
+    -   Role matching is shared via `HasinHayder\TyroLogin\Helpers\TwoFactorHelper` (supports `hasRole()` methods and a scalar `role` attribute), which also removes the forced-role logic previously duplicated across the login, magic link, social, and 2FA controllers.
+
+### Security
+
+-   **Skip/ignore endpoints can no longer bypass an active 2FA challenge** - `POST /two-factor/skip` and `POST /two-factor/ignore` only ever skip the setup screen. A user whose 2FA is already confirmed (`two_factor_confirmed_at` set) is redirected back to the challenge instead of being logged in, so `TYRO_LOGIN_2FA_ALLOW_SKIP=true` can no longer be used to circumvent the challenge step. Skip roles behave the same way: they suppress only the setup prompt, never the challenge.
+
 ## [2.16.2] - 2026-09-27
 
 ### Security

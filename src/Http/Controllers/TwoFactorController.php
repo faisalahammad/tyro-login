@@ -3,6 +3,7 @@
 namespace HasinHayder\TyroLogin\Http\Controllers;
 
 use HasinHayder\TyroLogin\Casts\EncryptedOrPlaintext;
+use HasinHayder\TyroLogin\Helpers\TwoFactorHelper;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -37,7 +38,19 @@ class TwoFactorController extends Controller {
             return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
         }
 
-        $forcedSetup = $this->userHasForcedRole($user);
+        $forcedSetup = TwoFactorHelper::userHasForcedRole($user);
+
+        // Role-based skip (skip_roles): these users are never prompted to set
+        // up 2FA during the login/registration flow — finish logging them in
+        // and send them to the post-login destination instead. An already
+        // authenticated user may still open this page to enroll voluntarily.
+        if (! $forcedSetup && ! Auth::check() && TwoFactorHelper::userHasSkipRole($user)) {
+            Auth::login($user, $request->session()->get('login.remember', false));
+            $request->session()->forget(['login.id', 'login.remember']);
+            $request->session()->regenerate();
+
+            return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
+        }
 
         // If allow_skip is enabled, the user has an ignore cookie, and their role is not forced, skip setup
         if (! $forcedSetup && config('tyro-login.two_factor.allow_skip', false)) {
@@ -184,7 +197,15 @@ class TwoFactorController extends Controller {
             }
         }
 
-        if ($user && $this->userHasForcedRole($user)) {
+        // Skipping only ever applies to the setup screen. A user who already
+        // set up 2FA must complete the challenge instead.
+        if ($user && filled($user->two_factor_confirmed_at)) {
+            return Auth::check()
+                ? redirect()->intended(config('tyro-login.redirects.after_login', '/'))
+                : redirect()->route('tyro-login.two-factor.challenge');
+        }
+
+        if ($user && TwoFactorHelper::userHasForcedRole($user)) {
             abort(403, 'Two factor authentication setup is required for your role.');
         }
 
@@ -219,7 +240,15 @@ class TwoFactorController extends Controller {
             return redirect()->route('tyro-login.login');
         }
 
-        if ($this->userHasForcedRole($user)) {
+        // Skipping only ever applies to the setup screen. A user who already
+        // set up 2FA must complete the challenge instead.
+        if (filled($user->two_factor_confirmed_at)) {
+            return Auth::check()
+                ? redirect()->intended(config('tyro-login.redirects.after_login', '/'))
+                : redirect()->route('tyro-login.two-factor.challenge');
+        }
+
+        if (TwoFactorHelper::userHasForcedRole($user)) {
             abort(403, 'Two factor authentication setup is required for your role.');
         }
 
@@ -423,41 +452,6 @@ class TwoFactorController extends Controller {
         }
 
         $user->forceFill(['two_factor_recovery_codes' => Crypt::encryptString($json)])->save();
-    }
-
-    /**
-     * Determine whether the user belongs to a role that requires 2FA setup (cannot skip).
-     */
-    protected function userHasForcedRole($user): bool {
-        $forcedRoles = config('tyro-login.two_factor.forced_roles', '');
-
-        if (empty($forcedRoles)) {
-            return false;
-        }
-
-        $roles = array_filter(array_map('trim', explode(',', $forcedRoles)));
-
-        if (empty($roles)) {
-            return false;
-        }
-
-        // Support Spatie / Bouncer style hasRole()
-        if (method_exists($user, 'hasRole')) {
-            foreach ($roles as $role) {
-                if ($user->hasRole($role)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        // Fallback: simple scalar 'role' attribute
-        if (isset($user->role)) {
-            return in_array($user->role, $roles);
-        }
-
-        return false;
     }
 
     /**

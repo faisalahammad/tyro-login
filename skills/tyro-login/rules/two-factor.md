@@ -266,6 +266,45 @@ public function userHasForcedRole($user): bool
 - The config defaults to an empty array (no forced roles).
 - Use `method_exists($user, 'hasRole')` for soft integration with role packages.
 - When 2FA is forced, the skip and ignore options must be hidden from the UI.
+- All role checks must go through `HasinHayder\TyroLogin\Helpers\TwoFactorHelper` — never re-implement the hasRole()/role-attribute matching inline in controllers.
+
+---
+
+## Config-Driven Skip 2FA Roles with Forced-Role Precedence
+
+### Why It Matters
+
+Sites often want 2FA mandatory for admins while never nagging regular users with the setup prompt. `tyro-login.two_factor.skip_roles` (comma-separated) lists roles that are never prompted to set up 2FA — after registration, on login, magic link login, social login, or by visiting the setup page directly. `forced_roles` is the security boundary and must always win: a role listed in both `forced_roles` and `skip_roles` is still required to set up 2FA, so a misconfigured skip list can never weaken a forced requirement.
+
+### Incorrect
+
+```php
+// skip_roles checked without forced-role precedence — weakens security
+if (TwoFactorHelper::userHasSkipRole($user)) {
+    return redirect()->intended(config('tyro-login.redirects.after_login', '/'));
+}
+```
+
+### Correct
+
+```php
+// forced_roles takes precedence inside userShouldSkipTwoFactorSetup()
+if (config('tyro-login.two_factor.enabled', false)
+    && ! TwoFactorHelper::userShouldSkipTwoFactorSetup($user)) {
+    return redirect()->route('tyro-login.two-factor.setup');
+}
+
+// TwoFactorHelper::userShouldSkipTwoFactorSetup() returns true only when
+// the user has a skip_roles role AND no forced_roles role.
+```
+
+### Notes
+
+- Config: `tyro-login.two_factor.skip_roles` (`TYRO_LOGIN_2FA_SKIP_ROLES`, e.g. `"user,editor"`), default empty.
+- Skip-role suppression applies to the setup prompt only — users who already confirmed 2FA still receive the challenge.
+- Independent of `allow_skip` and the ignore cookie: role-based skipping works even when per-user skipping is disallowed.
+- Apply the check at every setup-prompt site: registration auto-login, password login, magic link login, and social `handlePostLoginRedirect()`. In `TwoFactorController::showSetup()` the skip applies only to the mid-login flow (user resolved from `login.id` and not authenticated) — an authenticated skip-role user must still be able to open the setup page to enroll voluntarily.
+- Never skip the challenge for a confirmed user anywhere: every 2FA branch must test `filled($user->two_factor_confirmed_at)` before any skip/ignore/skip-role logic, including the `skip()` and `ignore()` endpoints (they must redirect a confirmed mid-challenge user back to the challenge rather than log them in).
 
 ---
 

@@ -54,6 +54,7 @@ HasinHayder\TyroLogin\Mail\*
 HasinHayder\TyroLogin\Casts\EncryptedOrPlaintext
 HasinHayder\TyroLogin\Traits\HasTwoFactorAuth
 HasinHayder\TyroLogin\Helpers\InvitationHelper
+HasinHayder\TyroLogin\Helpers\TwoFactorHelper
 ```
 
 ### Config and Environment Keys
@@ -101,6 +102,7 @@ Eight immutable principles that govern every decision in this package:
 | `src/Casts/EncryptedOrPlaintext.php` | Eloquent cast — reads encrypted or legacy plaintext, always writes encrypted |
 | `src/Traits/HasTwoFactorAuth.php` | User model trait — 2FA casts and helper methods |
 | `src/Helpers/InvitationHelper.php` | Static utility for invitation validation and referral tracking |
+| `src/Helpers/TwoFactorHelper.php` | Static utility for 2FA forced/skip role matching (forced roles win over skip roles) |
 | `src/Mail/OtpMail.php` | One-time password email |
 | `src/Mail/PasswordResetMail.php` | Password reset email |
 | `src/Mail/VerifyEmailMail.php` | Email verification email |
@@ -130,7 +132,7 @@ Eight immutable principles that govern every decision in this package:
 | `tyro-login.password_reset.*` | — | Token expiration in minutes |
 | `tyro-login.captcha.*` | — | Math captcha settings per form |
 | `tyro-login.otp.*` | — | OTP settings — length, expire, resend limits |
-| `tyro-login.two_factor.*` | — | TOTP 2FA — setup, challenge, forced roles, ignore cookie |
+| `tyro-login.two_factor.*` | — | TOTP 2FA — setup, challenge, forced roles, skip roles, ignore cookie |
 | `tyro-login.emails.*` | — | Per-email-type enable/subject configuration |
 | `tyro-login.social.*` | — | OAuth providers — 8 providers with per-provider settings |
 | `tyro-login.lockout.*` | — | Brute-force protection — max_attempts, duration, show_attempts_left |

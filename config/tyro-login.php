@@ -663,6 +663,12 @@ return [
 
         // Comma-separated roles that must set up 2FA and cannot skip (e.g. "admin,superadmin")
         'forced_roles' => env('TYRO_LOGIN_2FA_FORCED_ROLES', ''),
+
+        // Comma-separated roles that will not be prompted to set up 2FA
+        // after registration or login (e.g. "user,editor"). Useful when 2FA
+        // should apply to admins only, without nagging regular users.
+        // Roles listed in forced_roles always take precedence over skip_roles.
+        'skip_roles' => env('TYRO_LOGIN_2FA_SKIP_ROLES', ''),
     ],
 
     /*

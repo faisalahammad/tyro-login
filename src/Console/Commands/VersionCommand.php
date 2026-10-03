@@ -20,7 +20,7 @@ class VersionCommand extends Command {
      */
     public function handle(): int {
 
-        $version = '2.16.2'; // security(2fa): recovery codes are now rendered only as the response to the confirmation POST; the standalone GET recovery-codes route is removed
+        $version = '2.17.0'; // feature(2fa): skip_roles config (TYRO_LOGIN_2FA_SKIP_ROLES) — roles never prompted to set up 2FA; forced_roles always takes precedence; security(2fa): skip/ignore endpoints can no longer log in users with confirmed 2FA
         $this->info('');
         $this->info('  ╔════════════════════════════════════════╗');
         $this->info('  ║                                        ║');
@@ -39,6 +39,7 @@ class VersionCommand extends Command {
         return self::SUCCESS;
     }
 }
+// 2.17.0 - feature(2fa): added tyro-login.two_factor.skip_roles (TYRO_LOGIN_2FA_SKIP_ROLES) — comma-separated roles never prompted to set up 2FA after registration, login, magic link login, or social login; authenticated skip-role users can still open /two-factor/setup to enroll voluntarily; forced_roles always takes precedence; suppression applies to the setup prompt only, confirmed users still receive the challenge; role checks unified in Helpers\TwoFactorHelper. security(2fa): POST two-factor/skip and /ignore now redirect users with confirmed 2FA back to the challenge instead of logging them in
 // 2.16.2 - security(2fa): recovery codes can no longer be fetched directly. Codes are rendered only as the direct response to the confirmation POST (after TOTP verification and only when 2FA is enabled), and each set of codes is displayed exactly once
 // 2.16.1 - fix(2fa): recovery codes "Finish" button now redirects to the configured post-login destination (tyro-login.redirects.after_login) instead of the 2FA skip endpoint, which could 403 when skipping was disabled or the user had a forced role
 // 2.16.0 - Added intermediary confirmation page for magic links to prevent social media and chat preview crawlers from consuming and expiring one-time links

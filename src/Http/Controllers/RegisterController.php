@@ -4,6 +4,7 @@ namespace HasinHayder\TyroLogin\Http\Controllers;
 
 use HasinHayder\TyroLogin\Helpers\InvitationHelper;
 use HasinHayder\TyroLogin\Helpers\MailHelper;
+use HasinHayder\TyroLogin\Helpers\TwoFactorHelper;
 use HasinHayder\TyroLogin\Mail\WelcomeMail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -127,7 +128,8 @@ class RegisterController extends Controller {
         }
 
         if (config('tyro-login.registration.auto_login', true)) {
-            if (config('tyro-login.two_factor.enabled', false)) {
+            if (config('tyro-login.two_factor.enabled', false)
+                && ! TwoFactorHelper::userShouldSkipTwoFactorSetup($user)) {
                 // Do not fully login yet - set session and redirect to setup
                 $request->session()->put('login.id', $user->id);
                 // Default remember to false for registration flow or make it configurable/assumed true?

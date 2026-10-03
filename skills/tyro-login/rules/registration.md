@@ -152,7 +152,8 @@ return redirect(config('tyro-login.redirects.after_register', '/'));
 ```php
 // Auto-login with 2FA awareness
 if (config('tyro-login.registration.auto_login', true)) {
-    if (config('tyro-login.two_factor.enabled', false)) {
+    if (config('tyro-login.two_factor.enabled', false)
+        && ! TwoFactorHelper::userShouldSkipTwoFactorSetup($user)) {
         $request->session()->put('login.id', $user->id);
         $request->session()->put('login.remember', true);
         return redirect()->route('tyro-login.two-factor.setup');
@@ -168,6 +169,7 @@ return redirect(config('tyro-login.redirects.after_register', '/'));
 
 - Session keys for 2FA setup: `login.id` and `login.remember`.
 - When 2FA is enabled, the user is NOT logged in — the session only stores the user ID for the setup flow.
+- Users whose role is in `tyro-login.two_factor.skip_roles` (and not in `forced_roles`) skip the setup prompt and are logged in directly — check via `TwoFactorHelper::userShouldSkipTwoFactorSetup()`.
 - `login.remember` defaults to `true` for the registration flow (the user just registered, so remember is expected).
 
 ---

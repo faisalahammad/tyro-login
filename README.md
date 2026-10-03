@@ -83,7 +83,10 @@ TYRO_LOGIN_OTP_EXPIRE=5
 TYRO_LOGIN_2FA_ENABLED=true
 TYRO_LOGIN_2FA_ALLOW_SKIP=false   # force setup after login
 TYRO_LOGIN_2FA_FORCED_ROLES=admin,superadmin
+TYRO_LOGIN_2FA_SKIP_ROLES=user    # never prompt these roles to set up 2FA
 ```
+
+Combine role lists to shape the policy per role: admins are forced to set up 2FA, while roles in `TYRO_LOGIN_2FA_SKIP_ROLES` (here: `user`) never see the setup prompt — 2FA stays on without nagging regular users. See [Role-based setup enforcement](#role-based-setup-enforcement).
 
 ### Social login
 
@@ -350,10 +353,42 @@ php artisan tyro-login:update-config
 | `TYRO_LOGIN_2FA_ALLOW_SKIP` | `false` | Allow users to skip 2FA setup |
 | `TYRO_LOGIN_2FA_IGNORE_COOKIE_DAYS` | `30` | Days the skip-and-ignore cookie lasts |
 | `TYRO_LOGIN_2FA_FORCED_ROLES` | `''` | Comma-separated roles that must set up 2FA |
+| `TYRO_LOGIN_2FA_SKIP_ROLES` | `''` | Comma-separated roles never prompted to set up 2FA (forced roles take precedence) |
 | `TYRO_LOGIN_2FA_SETUP_TITLE` | `Two Factor Authentication` | Setup page title |
 | `TYRO_LOGIN_2FA_SETUP_SUBTITLE` | `Scan the QR code with your authenticator app.` | Setup page subtitle |
 | `TYRO_LOGIN_2FA_CHALLENGE_TITLE` | `Two Factor Authentication` | Challenge page title |
 | `TYRO_LOGIN_2FA_CHALLENGE_SUBTITLE` | `Enter the code from your authenticator app.` | Challenge page subtitle |
+
+#### Role-based setup enforcement
+
+Two comma-separated role lists control who is prompted to set up 2FA:
+
+- `TYRO_LOGIN_2FA_FORCED_ROLES` — roles that **must** set up 2FA. Users in these roles are always sent to the setup screen and cannot skip it (the skip/ignore buttons are hidden and the endpoints return `403`).
+- `TYRO_LOGIN_2FA_SKIP_ROLES` — roles that are **never prompted** to set up 2FA. Users in these roles skip the setup screen after registration, on login, magic link login, and social login. The setup screen is only suppressed as an automatic prompt — a logged-in user can still open `/two-factor/setup` to enroll voluntarily.
+
+```env
+TYRO_LOGIN_2FA_ENABLED=true
+TYRO_LOGIN_2FA_FORCED_ROLES=admin,superadmin
+TYRO_LOGIN_2FA_SKIP_ROLES=user,editor
+```
+
+With this configuration an `admin` is required to complete 2FA setup, while a `user` registers, logs in, and goes straight to the app — no 2FA setup screen in between.
+
+How the two lists interact:
+
+| User's role | `forced_roles` | `skip_roles` | Prompted to set up 2FA? |
+| --- | --- | --- | --- |
+| `admin` | yes | — | Yes — cannot skip |
+| `user` | — | yes | No — never prompted |
+| `user` | yes | yes | Yes — `forced_roles` always wins |
+
+Rules to keep in mind:
+
+- **`forced_roles` takes precedence.** A role listed in both lists is still required to set up 2FA — `skip_roles` can never weaken a forced requirement.
+- **Skip roles suppress the prompt, not the enrollment.** The setup screen never appears automatically for a skip role, but a logged-in user can still navigate to `/two-factor/setup` and enable 2FA voluntarily.
+- **Skip roles only skip the setup screen.** Users who have *already confirmed* 2FA always receive the challenge at login; `skip_roles` never disables 2FA for someone who set it up.
+- **Works independently of `allow_skip`.** `skip_roles` is an administrator-defined, role-based exemption; `allow_skip` is the per-user skip/ignore mechanism. Role-based skipping applies even when `TYRO_LOGIN_2FA_ALLOW_SKIP=false`.
+- **Role detection** uses the user model's `hasRole()` method (Spatie, Bouncer, Tyro, etc.) when available, and falls back to a scalar `role` attribute. With the [Tyro](#integration-with-tyro) integration enabled, new users automatically receive the default role (`TYRO_LOGIN_DEFAULT_ROLE_SLUG`, usually `user`), so `TYRO_LOGIN_2FA_SKIP_ROLES=user` covers them from their first login.
 
 ### Captcha
 

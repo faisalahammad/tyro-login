@@ -3,6 +3,7 @@
 namespace HasinHayder\TyroLogin\Http\Controllers;
 
 use HasinHayder\TyroLogin\Helpers\MailHelper;
+use HasinHayder\TyroLogin\Helpers\TwoFactorHelper;
 use HasinHayder\TyroLogin\Mail\WelcomeMail;
 use HasinHayder\TyroLogin\Models\SocialAccount;
 use Illuminate\Http\RedirectResponse;
@@ -225,30 +226,16 @@ class SocialAuthController extends Controller {
 
                 return redirect()->route('tyro-login.two-factor.challenge');
             } else {
-                if (config('tyro-login.two_factor.allow_skip', false)) {
-                    $forcedRoles = config('tyro-login.two_factor.forced_roles', '');
-                    $roles = $forcedRoles ? array_filter(array_map('trim', explode(',', $forcedRoles))) : [];
-                    $isForced = false;
+                // Role-based skip: users in skip_roles (and not in forced_roles)
+                // are never prompted to set up 2FA.
+                if (TwoFactorHelper::userShouldSkipTwoFactorSetup($user)) {
+                    return redirect()->intended($fallbackRedirect);
+                }
 
-                    if (! empty($roles)) {
-                        if (method_exists($user, 'hasRole')) {
-                            foreach ($roles as $role) {
-                                if ($user->hasRole($role)) {
-                                    $isForced = true;
-                                    break;
-                                }
-                            }
-                        } elseif (isset($user->role)) {
-                            $isForced = in_array($user->role, $roles);
-                        }
-                    }
-
-                    if (! $isForced) {
-                        $ignoreCookieName = 'tyro_2fa_ignore_'.$user->id;
-                        if ($request->cookie($ignoreCookieName)) {
-                            return redirect()->intended($fallbackRedirect);
-                        }
-                    }
+                if (config('tyro-login.two_factor.allow_skip', false)
+                    && ! TwoFactorHelper::userHasForcedRole($user)
+                    && $request->cookie('tyro_2fa_ignore_'.$user->id)) {
+                    return redirect()->intended($fallbackRedirect);
                 }
 
                 Auth::logout();
