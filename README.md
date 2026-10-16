@@ -541,7 +541,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Security
 
-If you discover any security-related issues, please email hasin@hasin.me instead of using the issue tracker.
+If you discover any security-related issues, please email hasin@hasin.me instead of using the issue tracker. Please see [SECURITY](SECURITY.md) for supported versions and the full disclosure process.
 
 ## License
 
