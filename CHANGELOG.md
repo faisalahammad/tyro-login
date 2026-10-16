@@ -2,7 +2,13 @@
 
 All notable changes to `tyro-login` will be documented in this file.
 
-## [Unreleased]
+## [2.17.2] - 2026-10-16
+
+### Fixed
+
+-   **Passwordless login no longer shows an unusable identifier field** - When password login is disabled (`TYRO_LOGIN_DISABLE_PASSWORD=true`), the email/username field is now rendered only when magic link login is also enabled. Passkey-only installs previously showed an email field that had no submit path; the login page now shows just the passkey button.
+
+## [2.17.0] - 2026-10-03
 
 ### Added
 
