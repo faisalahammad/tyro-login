@@ -280,7 +280,7 @@ php artisan tyro-login:update-config
 | `TYRO_LOGIN_FIELD` | `email` | Login field: `email`, `username`, or `both` |
 | `TYRO_LOGIN_REMEMBER_ME` | `true` | Show remember-me checkbox |
 | `TYRO_LOGIN_FORGOT_PASSWORD` | `true` | Show forgot-password link |
-| `TYRO_LOGIN_DISABLE_PASSWORD` | `false` | Disable password login entirely |
+| `TYRO_LOGIN_DISABLE_PASSWORD` | `false` | Disable password login entirely (also hides the email/username field unless magic links are enabled) |
 | `TYRO_LOGIN_ENABLE_MAGIC_LINKS` | `false` | Enable magic link login |
 | `TYRO_LOGIN_MAGIC_LINK_REQUIRE_CONFIRMATION` | `true` | Show intermediary confirmation page before consuming link (protects against crawler unfurling) |
 | `TYRO_LOGIN_MAGIC_LINK_EXPIRE` | `5` | Magic link expiry (minutes) |

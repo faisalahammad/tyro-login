@@ -255,3 +255,39 @@ it('can start otp login when otp expiry is configured as a string', function () 
     expect(session('tyro-login.otp.user_id'))->toBe($user->id);
     expect(Cache::get("tyro-login:otp:{$user->id}"))->not->toBeNull();
 });
+
+it('shows the identifier field when password login is enabled', function () {
+    config(['tyro-login.features.disable_password' => false]);
+
+    $response = $this->get('/login');
+
+    $response->assertStatus(200);
+    $response->assertSee('id="email"', false);
+    $response->assertSee('id="password"', false);
+});
+
+it('hides the identifier field when password login and magic links are disabled', function () {
+    config([
+        'tyro-login.features.disable_password' => true,
+        'tyro-login.features.magic_links_enabled' => false,
+    ]);
+
+    $response = $this->get('/login');
+
+    $response->assertStatus(200);
+    $response->assertDontSee('id="email"', false);
+    $response->assertDontSee('id="password"', false);
+});
+
+it('keeps the identifier field when password login is disabled but magic links are enabled', function () {
+    config([
+        'tyro-login.features.disable_password' => true,
+        'tyro-login.features.magic_links_enabled' => true,
+    ]);
+
+    $response = $this->get('/login');
+
+    $response->assertStatus(200);
+    $response->assertSee('id="email"', false);
+    $response->assertDontSee('id="password"', false);
+});

@@ -354,6 +354,7 @@ return [
 
         // Disable password-based login entirely
         // Hides password field, remember me, forgot password link, and "or" separator
+        // Also hides the email/username field unless magic link login is enabled
         // Useful when only passkey or magic link login is desired
         'disable_password' => env('TYRO_LOGIN_DISABLE_PASSWORD', false),
     ],

@@ -4,6 +4,11 @@
 @php
 $passkeysEnabled = ($passkeysEnabled ?? false);
 $webauthnToken = $passkeysEnabled ? ' webauthn' : '';
+$disablePassword = ($features['disable_password'] ?? false);
+$magicLinksEnabled = config('tyro-login.features.magic_links_enabled', false);
+// The identifier field is only useful when password login is enabled, or when
+// magic links need an email/username to send a link to.
+$showLoginField = !$disablePassword || $magicLinksEnabled;
 @endphp
 <div class="auth-container {{ $layout }}" @if($layout==='fullscreen' ) style="background-image: url('{{ $backgroundImage }}');" @endif @if($layout==='youtube-video') id="tyro-youtube-container" @endif>
     @if(in_array($layout, ['split-left', 'split-right']))
@@ -36,8 +41,10 @@ $webauthnToken = $passkeysEnabled ? ' webauthn' : '';
             <!-- Header -->
             <div class="form-header">
                 <h2>Log in to your account</h2>
-                @if($features['disable_password'] ?? false)
-                    @if(($loginField ?? 'email') === 'username')
+                @if($disablePassword)
+                    @if(!$showLoginField)
+                    <p>Sign in with your passkey to continue</p>
+                    @elseif(($loginField ?? 'email') === 'username')
                     <p>Enter your username below to log in</p>
                     @elseif(($loginField ?? 'email') === 'both')
                     <p>Enter your email or username below to log in</p>
@@ -81,6 +88,7 @@ $webauthnToken = $passkeysEnabled ? ' webauthn' : '';
                 @csrf
 
                 <!-- Login Field (Email, Username, or Both) -->
+                @if($showLoginField)
                 @if(($loginField ?? 'email') === 'both')
                 <div class="form-group">
                     <label for="login" class="form-label">Email or Username</label>
@@ -106,8 +114,9 @@ $webauthnToken = $passkeysEnabled ? ' webauthn' : '';
                     @enderror
                 </div>
                 @endif
+                @endif
 
-                @if(!($features['disable_password'] ?? false))
+                @if(!$disablePassword)
                 <!-- Password Field -->
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
@@ -148,7 +157,7 @@ $webauthnToken = $passkeysEnabled ? ' webauthn' : '';
                 </div>
                 @endif
 
-                @if(!($features['disable_password'] ?? false))
+                @if(!$disablePassword)
                 <!-- Submit Button -->
                 <button type="submit" class="btn btn-primary">
                     Log in
@@ -157,15 +166,15 @@ $webauthnToken = $passkeysEnabled ? ' webauthn' : '';
             </form>
 
             <!-- Magic Login Button -->
-            @if(config('tyro-login.features.magic_links_enabled', false))
-            @if(!($features['disable_password'] ?? false))
+            @if($magicLinksEnabled)
+            @if(!$disablePassword)
             <div class="form-divider" style="margin: 1.5rem 0; text-align: center; position: relative;">
                 <span style="background-color: var(--background); padding: 0 1rem; position: relative; z-index: 1; color: #9ca3af; font-size: 0.875rem;">or</span>
                 <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background-color: #e5e7eb;"></div>
             </div>
             @endif
 
-            <form method="POST" action="{{ route('tyro-login.magic-link.request') }}" id="magic-link-form" @if(!($features['disable_password'] ?? false)) style="margin-top: 0;" @else style="margin-top: 0.5rem;" @endif>
+            <form method="POST" action="{{ route('tyro-login.magic-link.request') }}" id="magic-link-form" @if(!$disablePassword) style="margin-top: 0;" @else style="margin-top: 0.5rem;" @endif>
                 @csrf
                 <input type="hidden" name="email" id="magic-email" value="">
                 <input type="hidden" name="username" id="magic-username" value="">
