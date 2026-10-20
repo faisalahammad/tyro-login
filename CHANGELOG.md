@@ -2,6 +2,12 @@
 
 All notable changes to `tyro-login` will be documented in this file.
 
+## [2.17.3] - 2026-10-20
+
+### Security
+
+-   **Markup in registration names is rejected** - The `name` field on registration now fails validation when it contains `<` or `>` characters. This blocks malicious registrations that embed HTML or links (for example `<a href="...">` spam) in the stored user name. The rule applies only to the registration form; existing accounts are not modified.
+
 ## [2.17.2] - 2026-10-16
 
 ### Fixed

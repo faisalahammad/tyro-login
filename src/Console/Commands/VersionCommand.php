@@ -20,7 +20,7 @@ class VersionCommand extends Command {
      */
     public function handle(): int {
 
-        $version = '2.17.2'; // fix(login): email/username field now only renders when password login is enabled or magic links are enabled — passkey-only installs no longer show an unusable identifier field
+        $version = '2.17.3'; // security(registration): names containing markup (< or >) are now rejected at registration, blocking HTML/link injection in user names
         $this->info('');
         $this->info('  ╔════════════════════════════════════════╗');
         $this->info('  ║                                        ║');
@@ -39,6 +39,7 @@ class VersionCommand extends Command {
         return self::SUCCESS;
     }
 }
+// 2.17.3 - security(registration): the name field on /register now rejects markup (any < or > characters), so names containing HTML tags or links are refused instead of being stored
 // 2.17.2 - fix(login): the email/username field is now only rendered when password login is enabled or magic links are enabled; when TYRO_LOGIN_DISABLE_PASSWORD=true and magic links are off, the login page shows the passkey button only (no unusable email field)
 // 2.17.0 - feature(2fa): added tyro-login.two_factor.skip_roles (TYRO_LOGIN_2FA_SKIP_ROLES) — comma-separated roles never prompted to set up 2FA after registration, login, magic link login, or social login; authenticated skip-role users can still open /two-factor/setup to enroll voluntarily; forced_roles always takes precedence; suppression applies to the setup prompt only, confirmed users still receive the challenge; role checks unified in Helpers\TwoFactorHelper. security(2fa): POST two-factor/skip and /ignore now redirect users with confirmed 2FA back to the challenge instead of logging them in
 // 2.16.2 - security(2fa): recovery codes can no longer be fetched directly. Codes are rendered only as the direct response to the confirmation POST (after TOTP verification and only when 2FA is enabled), and each set of codes is displayed exactly once
