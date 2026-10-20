@@ -209,7 +209,8 @@ class RegisterController extends Controller {
         }
 
         $rules = [
-            'name' => ['required', 'string', 'max:255'],
+            // Reject markup in names to block HTML/link injection via registration
+            'name' => ['required', 'string', 'max:255', 'regex:/^[^<>]*$/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.$usersTable],
             'password' => $passwordRules,
         ];

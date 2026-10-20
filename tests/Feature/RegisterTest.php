@@ -186,3 +186,15 @@ it('redirects to login when registration is disabled', function () {
 
     $response->assertRedirect(route('tyro-login.login'));
 });
+
+it('rejects markup in the name field on registration', function () {
+    $response = $this->post('/register', [
+        'name' => '<a href="http://toomat.ru/go-na.php?yjxqpa">$3,222 deposit available</a>',
+        'email' => 'markup@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+    ]);
+
+    $response->assertSessionHasErrors('name');
+    $this->assertDatabaseMissing('users', ['email' => 'markup@example.com']);
+});
